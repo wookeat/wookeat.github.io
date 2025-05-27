@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Subject Plan DSL - User Guide</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>Subject Plan Format - User Documentation</h1>
+
+<p>This guide explains how to write valid subject plans using the domain-specific language (DSL) supported by the parser system.</p>
+
+<h2>General Structure</h2>
+<pre><code>Course: &lt;course_code&gt;
+Year: &lt;year&gt;
+Cohort: &lt;YYYY&gt;-&lt;MM&gt;
+Modules:
+    Sem-&lt;n&gt; (&lt;YYYY&gt;-&lt;MM&gt;) :
+        * &lt;code&gt; &lt;title&gt; [&lt;credits&gt;]
+            @ &lt;coreq_code&gt;
+            ~ &lt;prereq_code&gt;
+        # &lt;code&gt; &lt;title&gt; [&lt;credits&gt;]</code></pre>
+
+<h3>Required keywords</h3>
+<ul>
+    <li><code>Course</code>, <code>Year</code>, <code>Cohort</code>, <code>Modules</code>, and <code>Sem-<i>n</i></code> are required.</li>
+    <li>Indentation is strict: <strong>4 spaces per level</strong>.</li>
+</ul>
+
+<h2>Keywords &amp; Syntax Rules</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Element</th>
+        <th>Syntax Example</th>
+        <th>Notes</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr><td>Course</td><td><code>Course: 481BCS1-SA</code></td><td>Alphanumeric identifier</td></tr>
+    <tr><td>Year</td><td><code>Year: 2025</code></td><td>4-digit number</td></tr>
+    <tr><td>Cohort</td><td><code>Cohort: 2023-09</code></td><td>Format <code>YYYY-MM</code></td></tr>
+    <tr><td>Modules</td><td><code>Modules:</code></td><td>Start of modules list</td></tr>
+    <tr><td>Semester</td><td><code>Sem-1 (2023-09) :</code></td><td>Strict format: <code>Sem-n (YYYY-MM)</code></td></tr>
+    <tr><td>Compulsory</td><td><code>* CS101 Title [10]</code></td><td>Use <code>*</code> for compulsory modules</td></tr>
+    <tr><td>Optional</td><td><code># MAT102 Title [10]</code></td><td>Use <code>#</code> for optional modules</td></tr>
+    <tr><td>Prerequisite</td><td><code>~ CS100</code></td><td>12-space indent under module</td></tr>
+    <tr><td>Corequisite</td><td><code>@ MTH1014</code></td><td>Same indent as prerequisite</td></tr>
+    </tbody>
+</table>
+
+<h2>Module Markers</h2>
+<ul>
+    <li><code>*</code> — Compulsory module</li>
+    <li><code>#</code> — Optional module</li>
+</ul>
+
+<h2>Requisite Markers</h2>
+<ul>
+    <li><code>@</code> — Corequisite</li>
+    <li><code>~</code> — Prerequisite (can be another module or an academic year number)</li>
+</ul>
+
+<h2>Valid Example</h2>
+<pre><code>Course: 481BCS1-SA
+Year: 2025
+Cohort: 2023-09
+Modules:
+    Sem-1 (2023-09) :
+        * CS101 Introduction to Programming [10]
+            ~ CS100
+            @ MAT101
+        # MAT101 Discrete Mathematics [10]
+    Sem-2 (2024-01) :
+        * CS102 Data Structures [10]
+            ~ CS101</code></pre>
+
+<h2>Common Errors to Avoid</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Error</th>
+        <th>Cause</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr><td class="error">Unexpected indentation</td><td>Use exactly 4-space indents; no tabs or mixed spacing</td></tr>
+    <tr><td class="error">Invalid token</td><td>Disallowed characters like <code>!</code>, <code>%</code>, <code>{}</code> etc.</td></tr>
+    <tr><td class="error">Duplicate module codes</td><td>Module code reused across semesters</td></tr>
+    <tr><td class="error">Module not found</td><td>Referencing nonexistent modules in prerequisites/corequisites</td></tr>
+    <tr><td class="error">Invalid academic year ref</td><td>Invalid use of year numbers (e.g. <code>~ 5</code> when max is 3)</td></tr>
+    <tr><td class="error">Circular module reference</td><td>Module lists itself as a prereq/coreq</td></tr>
+    </tbody>
+</table>
+
+<h2>Output</h2>
+<p>On successful parsing, the system builds a structured object model. You can "unparse" it to regenerate the original format with:</p>
+<pre><code>parser.unparse(course)</code></pre>
+
+</body>
+</html>
