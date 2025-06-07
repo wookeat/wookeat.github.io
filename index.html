@@ -5,118 +5,372 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Subject Plan DSL - User Guide</title>
     <link rel="stylesheet" href="style.css">
+    <script src="index.js"></script>
 </head>
 <body>
 <h1>Subject Plan Format - User Documentation</h1>
 
 <p>This guide explains how to write valid subject plans using the domain-specific language (DSL) supported by the parser system.</p>
 
-<h2>General Structure</h2>
-<pre><code>Course: &lt;course_code&gt;
-Year: &lt;year&gt;
-Cohort: &lt;YYYY&gt;-&lt;MM&gt;
+<h2 style="margin-bottom: 0.5rem">General Structure</h2>
+<div class="structure-container">
+    <div class="indentation-img">
+        <img src="indentation.png" alt="indentation structure">
+    </div>
+    <div class="indentation-desc">
+        <h3 style="margin-left: 1rem; margin-right: 1rem">Description</h3>
+        <div style="margin-left: 1rem; margin-right: 1rem">
+            <li>
+                The indentation for the subject plan format is strict: <strong>4 spaces per level</strong>. Such format is required to enforce a structural layout for the plan.
+                <ul>
+                    <li>Semester definition should start after <strong>1 indent level</strong></li>
+                    <li>Module block should start after <strong>2 indent levels</strong>. The co-requisite and pre-requisite of the module should start with <strong>3 indent levels</strong>.</li>
+                    <li>Module grouping which cater for elective modules should start after <strong>2 indent levels</strong> as well. The module within the group should start with <strong>3 indent levels</strong>.
+                        Co-requisite and pre-requisite should start with <strong>4 indent levels </strong>if there is any.</li>
+                </ul>
+            </li>
+            <li>
+                The subject plan utilizes markers such as <code>&lt;!&gt;</code>, <code>&lt;*&gt;</code>, <code>&lt;#&gt;</code>, <code>&lt;?&gt;</code>, <code>&lt;+&gt;</code> for parser to identify the start of a block.
+                Please refer to following sections for more info.
+            </li>
+        </div>
+    </div>
+</div>
+
+<div class="section" id="syntax">
+    <h2>Syntax Rules</h2>
+
+    <div class="side-by-side-header-container">
+        <div class="left-header">
+            <h3>Basic Structure</h3>
+        </div>
+        <div class="right-header">
+            <h3>Example</h3>
+        </div>
+    </div>
+
+    <div class="container">
+        <table>
+            <thead>
+            <tr>
+                <th>Element</th>
+                <th>Syntax</th>
+                <th>Description</th>
+<!--                <th>Example</th>-->
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td onmouseover="highlightText(this, true, 'course')" onmouseout="highlightText(this, false, 'course')">Course Declaration <span class="info-icon" title="More information">i</span></td>
+                <td><code>Course: &lt;course_code&gt;</code></td>
+                <td>Defines the course code</td>
+<!--                <td><code>Course: 481BCS-SA</code></td>-->
+            </tr>
+            <tr>
+                <td onmouseover="highlightText(this, true, 'academic-year')" onmouseout="highlightText(this, false, 'academic-year')">Academic Year <span class="info-icon" title="More information">i</span></td>
+                <td><code>Year: &lt;year&gt;</code></td>
+                <td>Four-digit year in <code>YYYY</code> format</td>
+<!--                <td><code>Year: 2024</code></td>-->
+            </tr>
+            <tr>
+                <td onmouseover="highlightText(this, true, 'cohort')" onmouseout="highlightText(this, false, 'cohort')">Cohort <span class="info-icon" title="More information">i</span></td>
+                <td><code>Cohort: &lt;YYYY&gt;-&lt;MM&gt;</code></td>
+                <td>Cohort year and month (hyphen-separated)</td>
+<!--                <td><code>Cohort: 2024-09</code></td>-->
+            </tr>
+            <tr>
+                <td onmouseover="highlightText(this, true, 'modules')" onmouseout="highlightText(this, false, 'modules')">Modules Section <span class="info-icon" title="More information">i</span></td>
+                <td><code>Modules:</code></td>
+                <td>Container for all semesters</td>
+<!--                <td><code>Modules:</code></td>-->
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="code-block">
+    <pre><code><span class="course">Course: 481BCS-SA</span>
+<span class="academic-year">Year: 2024</span>
+<span class="cohort">Cohort: 2024-09</span>
+<span class="modules">Modules:</span></code></pre>
+        </div>
+    </div>
+
+    <div class="side-by-side-header-container">
+        <div class="left-header">
+            <h3>Semester Definition</h3>
+        </div>
+        <div class="right-header">
+            <h3>Example</h3>
+        </div>
+    </div>
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Element</th>
+                    <th>Syntax</th>
+                    <th>Description</th>
+    <!--                <th>Example</th>-->
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td onmouseover="highlightText(this, true, 'semester')" onmouseout="highlightText(this, false, 'semester')">Semester <span class="info-icon" title="More information">i</span></td>
+                    <td><code>Sem-&lt;number&gt; (&lt;YYYY&gt;-&lt;MM&gt;):</code></td>
+                    <td>Semester number with year-month</td>
+    <!--                <td><code>Sem-1 (2024-09):</code></td>-->
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="code-block">
+    <pre><code>Course: 481BCS-SA
+Year: 2024
+Cohort: 2024-09
 Modules:
-    Sem-&lt;n&gt; (&lt;YYYY&gt;-&lt;MM&gt;) :
-        * &lt;code&gt; &lt;title&gt; [&lt;credits&gt;]
-            @ &lt;coreq_code&gt;
-            ~ &lt;prereq_code&gt;
-        # &lt;code&gt; &lt;title&gt; [&lt;credits&gt;]</code></pre>
+    <span class="semester">Sem-1 (2024-09):</span></code></pre>
+        </div>
+    </div>
 
-<h3>Required keywords</h3>
-<ul>
-    <li><code>Course</code>, <code>Year</code>, <code>Cohort</code>, <code>Modules</code>, and <code>Sem-<i>n</i></code> are required.</li>
-    <li>Indentation is strict: <strong>4 spaces per level</strong>.</li>
-</ul>
+    <div class="side-by-side-header-container">
+        <div class="left-header">
+            <h3>Module Definition</h3>
+        </div>
+        <div class="right-header">
+            <h3>Example</h3>
+        </div>
+    </div>
+    <div class="container">
+        <table>
+            <thead>
+            <tr>
+                <th>Element</th>
+                <th>Syntax</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
 
-<h2>Keywords &amp; Syntax Rules</h2>
-<table>
-    <thead>
-    <tr>
-        <th>Element</th>
-        <th>Syntax Example</th>
-        <th>Notes</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr><td>Course</td><td><code>Course: 481BCS1-SA</code></td><td>Alphanumeric identifier</td></tr>
-    <tr><td>Year</td><td><code>Year: 2025</code></td><td>4-digit number</td></tr>
-    <tr><td>Cohort</td><td><code>Cohort: 2023-09</code></td><td>Format <code>YYYY-MM</code></td></tr>
-    <tr><td>Modules</td><td><code>Modules:</code></td><td>Start of modules list</td></tr>
-    <tr><td>Semester</td><td><code>Sem-1 (2023-09) :</code></td><td>Strict format: <code>Sem-n (YYYY-MM)</code></td></tr>
-    <tr><td>Core module</td><td><code>! MTH1114 Computer Mathematics [4]</code></td><td>Use <code>!</code> for core modules</td></tr>
-    <tr><td>Major elective module</td><td><code>* CSC3206 Artificial Intelligence [4]</code></td><td>Use <code>*</code> for major elective modules</td></tr>
-    <tr><td>Non-major elective module</td><td><code># PSY2164 Introduction to Psychology [4]</code></td><td>Use <code>#</code> for non-major elective modules</td></tr>
-    <tr><td>MPU module</td><td><code>? MPU3193 Falsafah dan Isu Semasa [3]</code></td><td>Use <code>?</code> for MPU modules</td></tr>
-    <tr><td>Prerequisite</td><td><code>~ CS100</code></td><td>12-space indent under module</td></tr>
-    <tr><td>Corequisite</td><td><code>@ MTH1014</code></td><td>Same indent as prerequisite</td></tr>
-    </tbody>
-</table>
+            <tr>
+                <td>Module Structure</td>
+                <td><code>&lt;module marker&gt; &lt;code&gt; &lt;title&gt; [&lt;credits&gt;]</code></td>
+                <td>Each module starts with a marker, followed by the code, title, and credits in <code>[]</code>.</td>
+            </tr>
 
-<h2>Module Markers</h2>
-<ul>
-    <li><code>!</code> — Core module</li>
-    <li><code>*</code> — Major elective module</li>
-    <li><code>#</code> — Non-major elective module</li>
-    <li><code>?</code> — MPU module</li>
-</ul>
+            <tr>
+                <td rowspan="4" class="module-marker-label" onmouseover="highlightText(this, true, 'module-marker')" onmouseout="highlightText(this, false, 'module-marker')">Module Marker <span class="info-icon" title="More information">i</span></td>
+                <td><code>!</code></td>
+                <td>Core module</td>
+            </tr>
+            <tr>
+                <td><code>*</code></td>
+                <td>Major elective module</td>
+            </tr>
+            <tr>
+                <td><code>#</code></td>
+                <td>Non-major elective module</td>
+            </tr>
+            <tr>
+                <td><code>?</code></td>
+                <td>MPU module</td>
+            </tr>
+            <tr>
+                <td onmouseover="highlightText(this, true, 'module-grouping')" onmouseout="highlightText(this, false, 'module-grouping')">Module Grouping <span class="info-icon" title="More information">i</span></td>
+                <td><code>&lt;module marker&gt; Year-&lt;academic year&gt; {&lt;no. of elective(s)&gt;}</code></td>
+                <td>
+                    <li>
+                        The <code>&lt;module marker&gt;</code> indicates the type of modules in the group, helping the parser classify them.
+                    </li>
+                    <li>
+                        The <code>Year-&lt;academic year&gt;</code> keyword groups elective modules under a specific academic year.
+                    </li>
+                    <li>
+                        The number enclosed in curly brackets <code>{}</code> specifies how many modules a student is required to select from that group.
+                    </li>
 
-<h2>Requisite Markers</h2>
-<ul>
-    <li><code>@</code> — Corequisite</li>
-    <li><code>~</code> — Prerequisite (can be another module or an academic year number)</li>
-</ul>
+                    <strong>Note: Within the group, each module definition must begin with the special marker <code>+</code> to indicate to the parser that it belongs to the group.</strong>
+                </td>
+            </tr>
+            <tr>
+                <td onmouseover="highlightText(this, true, 'requisite-module')" onmouseout="highlightText(this, false, 'requisite-module')">Requisite Module <span class="info-icon" title="More information">i</span></td>
+                <td><code>&lt;requisite marker&gt;</code> <code>&lt;module code&gt;</code></td>
+                <td>Pre-requisite and co-requisite module only require its marker and the module code.
+                    The parser will perform a lookup and get the respective module during module object creation based on the marker and code.
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="2" class="requisite-marker-label" onmouseover="highlightText(this, true, 'requisite-marker')" onmouseout="highlightText(this, false, 'requisite-marker')">Requisite Marker <span class="info-icon" title="More information">i</span></td>
+                <td><code>~</code></td>
+                <td>Pre-requisite module</td>
+            </tr>
+            <tr>
+                <td><code>@</code></td>
+                <td>Co-requisite module</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="code-block">
+    <pre><code>Course: 481BCS-SA
+Year: 2024
+Cohort: 2024-09
+Modules:
+    Sem-1 (2024-09):
+        <span class="module-marker">!</span> MTH1114 Computer Mathematics [4]
+        <span class="module-marker">!</span> CSC1202 Computer Organisation [4]
+    Sem-2 (2023-01):
+        <span class="module-grouping"><span class="module-marker">?</span> Year-1 {2}
+            + MPU3193 Falsafah dan Isu Semasa [3]
+            + MPU3183 Penghayatan Etika dan Peradaban [3]</span>
+    Sem-3 (2023-03):
+        <span class="module-marker">!</span> PRG1203 Object Oriented Programming Fundamentals [4]
+            <span class="requisite-module"><span class="requisite-marker">~</span> CSC1024</span>
+        <span class="module-grouping"><span class="module-marker">#</span> Year-1 {1}
+            + IST1024 Introduction to Statistics [4]
+            + MGT1014 Principles and Practice of Management [4]</span></code></pre>
+        </div>
+    </div>
+</div>
+
 
 <h2>Valid Example</h2>
-<pre><code>Course: 481BCS1-SA
-Year: 2025
-Cohort: 2023-09
+<details>
+    <summary>Subject Plan [Longer Version]</summary>
+<pre><code>Course : 481BCS1-SA
+Year : 2024
+Cohort : 2022-04
 Modules:
-    Sem-1(2022-08):
+    Sem-1 (2022-08):
+        ! CSC1024 Programming Principles [4]
         ! MTH1114 Computer Mathematics [4]
         ! ENG1044 English for Computer Technology Studies [4]
-    Sem-2(2022-02):
-        ? MPU3203 Appreciation of Ethics and Civilisation [3]
-        ? MPU3193 Falsafah dan Isu Semasa [3]
-    Sem-3(2022-04):
+        ! CSC1202 Computer Organisation [4]
+    Sem-2 (2023-01):
+        ? Year-1 {2}
+            + MPU3193 Falsafah dan Isu Semasa [3]
+            + MPU3183 Penghayatan Etika dan Peradaban [3]
+            + MPU3213 Malay Language for Communication 2 [3]
+            + MPU3203 Appreciation of Ethics and Civilisation [3]
+    Sem-3 (2023-03):
         ! NET1014 Networking Principles [4]
-        ! CSC1024 Programming Principles [4]
-    Sem-4(2023-08):
+        ! SEG1201 Database Fundamentals [4]
         ! PRG1203 Object Oriented Programming Fundamentals [4]
             ~ CSC1024
-        # PSY2164 Introduction to Psychology [4]
-        ! ENG2042 Communication Skills [2]
+        ! WEB1201 Web Fundamentals [4]
+        # Year-1 {1}
+            + IST1024 Introduction to Statistics [4]
+            + MGT1014 Principles and Practice of Management [4]
+    Sem-4 (2023-08):
         ! CSC2014 Digital Image Processing [4]
-    Sem-5(2024-02):
-        ? MU42422 Community Service [2]
-            ~ ENG2042
-        ? BIS2212 Social & Professional Responsibilities [2]
-    Sem-6(2024-05):
-        * CSC3206 Artificial Intelligence [4]
+        ! NET2201 Computer Networks [4]
+        ! ENG2042 Communication Skills [2]
+        ! CSC3024 Human Computer Interaction [4]
+            ~ WEB1201
+        # Year-1 {1}
+            + PSY2164 Introduction to Psychology [4]
+            + MKT2224 Principles of Marketing [4]
+            + ENT2114 Principles of Entrepreneurship [4]
+            + DECN2014 Digital Economy [4]
+            + ETP2014 Startup Foundry [4]
+    Sem-5 (2024-01):
+        ? Year-1 {1}
+            + BIS2212 Social & Professional Responsibilities [2]
+            + MU42422 Community Service [2]
+                ~ ENG2042
+    Sem-6 (2024-03):
+        ! CSC2103 Data Structure & Algorithms [4]
             ~ CSC1024
-        # MKT2224 Principles of Marketing [4]
+        ! CSC2104 Operating System Fundamentals [4]
+        ! SEG2202 Software Engineering [4]
+            ~ PRG1203
+        ! CSC3206 Artificial Intelligence [4]
+            ~ CSC1024
         ! PRG2104 Object Oriented Programming [4]
             ~ PRG1203
-    Sem-7(2024-08):
+    Sem-7 (2024-08):
+        ! NET3204 Distributed Systems [4]
+            ~ PRG2104
         ! PRJ3213 Capstone Project 1 [3]
             ~ ENG1044
             ~ PRG2104
-        * CSC3034 Computational Intelligence [4]
-            @ CSC3206
-    Sem-8(2025-01):
+        * Year-3 {1}
+            + CSC3064 Database Engineering [4]
+                ~ SEG2102
+            + CSC3209 Software Architecture and Design Patterns [4]
+                ~ PRG2104
+                ~ SEG2202
+            + CSC3014 Computer Vision [4]
+                ~ CSC2014
+            + CSC3034 Computational Intelligence [4]
+                ~ CSC3206
+            + CSC3044 Computer Security [4]
+                ~ SEG1201
+                ~ CSC1024
+                ~ WEB1201
+            + PRG3014 UI/UX Design and Development [4]
+                ~ PRG1203
+                @ CSC3024
+        * Year-2 {1}
+            + PRG2205 Programming Languages [4]
+                ~ CSC2103
+                ~ PRG2104
+            + NET2102 Data Communications [4]
+            + SEG2102 Database Management Systems [4]
+                ~ SEG1201
+            + CSC2044 Concurrent Programming [4]
+                ~ PRG1203
+                ~ PRG2104
+            + PRG2214 Functional Programming Principles [4]
+            + BIS2216 Data Mining and Knowledge Discovery Fundamentals [4]
+                ~ IST1024
+            + IST2334 Web and Network Analytics [4]
+        # Year-1 {1}
+            + PSY2164 Introduction to Psychology [4]
+            + MKT2224 Principles of Marketing [4]
+            + ENT2114 Principles of Entrepreneurship [4]
+            + DECN2014 Digital Economy [4]
+            + ETP2014 Startup Foundry [4]
+    Sem-8 (2025-01):
         ! SEG3203 Internship [6]
-            ~ BIS2212
-            ~ YEAR2
-    Sem-9(2025-04):
+    Sem-9 (2025-03):
         ! PRJ3223 Capstone Project 2 [3]
             ~ PRJ3213
-        * CSC3014 Computer Vision [4]
-            ~ CSC2014
-        * CSC2044 Concurrent Programming [4]
-            ~ PRG1203
-            ~ PRG2104</code></pre>
+        * Year-3 {1}
+            + CSC3064 Database Engineering [4]
+                ~ SEG2102
+            + CSC3209 Software Architecture and Design Patterns [4]
+                ~ PRG2104
+                ~ SEG2202
+            + CSC3014 Computer Vision [4]
+                ~ CSC2014
+            + CSC3034 Computational Intelligence [4]
+                ~ CSC3206
+            + CSC3044 Computer Security [4]
+                ~ SEG1201
+                ~ CSC1024
+                ~ WEB1201
+            + PRG3014 UI/UX Design and Development [4]
+                ~ PRG1203
+                @ CSC3024
+        * Year-2 {1}
+            + PRG2205 Programming Languages [4]
+            + NET2102 Data Communications [4]
+            + SEG2102 Database Management Systems [4]
+                ~ SEG1201
+            + CSC2044 Concurrent Programming [4]
+                ~ PRG1203
+                ~ PRG2104
+            + PRG2214 Functional Programming Principles [4]
+                ~ CSC1024
+                ~ MTH1114
+            + BIS2216 Data Mining and Knowledge Discovery Fundamentals [4]
+                ~ IST1024
+            + IST2334 Web and Network Analytics [4]</code></pre>
+</details>
+
 
 <h2>Common Errors to Avoid</h2>
-<table>
+<table class="error-table">
     <thead>
     <tr>
         <th>Error</th>
@@ -125,7 +379,7 @@ Modules:
     </thead>
     <tbody>
     <tr><td class="error">Unexpected indentation</td><td>Use exactly 4-space indents; no tabs or mixed spacing</td></tr>
-    <tr><td class="error">Invalid token</td><td>Disallowed characters like <code>%</code>, <code>{}</code> etc.</td></tr>
+    <tr><td class="error">Invalid token</td><td>Disallowed characters like <code>%</code>, <code>$</code> etc.</td></tr>
     <tr><td class="error">Duplicate module codes</td><td>Module code reused across semesters</td></tr>
     <tr><td class="error">Module not found</td><td>Referencing nonexistent modules in prerequisites/corequisites</td></tr>
     <tr><td class="error">Invalid academic year ref</td><td>Invalid use of year numbers (e.g. <code>~ 5</code> when max is 3)</td></tr>
